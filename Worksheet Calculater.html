@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <title>Subject Wise Time Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; background: #f0f2f5; color: #333; }
+        .container { max-width: 550px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        h3 { color: #1a73e8; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .section-title { font-weight: bold; color: #1a73e8; text-align: left; margin: 15px 0 10px 0; font-size: 16px; }
+        
+        .input-group { margin-bottom: 12px; text-align: left; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; color: #555; }
+        input { padding: 10px; width: 100%; box-sizing: border-box; border: 2px solid #dfe1e5; border-radius: 8px; font-size: 16px; transition: 0.3s; }
+        
+        /* Time inputs row */
+        .time-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .time-row div { flex: 1; text-align: left; }
+        
+        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
+        
+        /* බොත්තම කොටු දෙකට යටින් ඒමට සකස් කළ style එක */
+        .btn-add { background: #1a73e8; color: white; width: 100%; margin-top: 5px; margin-bottom: 15px; }
+        
+        .btn-calc { background: #1a73e8; color: white; width: 100%; margin-top: 10px; }
+        .btn-reset { background: #ea4335; color: white; width: 100%; margin-top: 8px; }
+        
+        #results-area { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: left; }
+        .result-item { font-size: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; color: #000; }
+
+        .label-badge {
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .blue-bg { background: #1a73e8; }
+        .green-bg { background: #34a853; }
+
+        .time-value { font-weight: bold; color: #333; }
+
+        hr { border: 0; border-top: 1px solid #ddd; margin: 15px 0; }
+        .shift-list { background: #eef4ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; max-height: 120px; overflow-y: auto; text-align: left; font-size: 14px; border-left: 4px solid #1a73e8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>විෂයයන් අනුව කාලය ගණනය</h3>
+    
+    <div class="section-title">ප්‍රමිතිගත කාල පරාසයන් (Shifts)</div>
+    
+    <div class="time-row">
+        <div><label>ආරම්භය:</label><input type="time" id="shiftStart"></div>
+        <div><label>අවසානය:</label><input type="time" id="shiftEnd"></div>
+    </div>
+    
+    <button class="btn-add" onclick="addShift()">ඇතුළත් කරන්න</button>
+    
+    <div id="shiftDisplay" class="shift-list">ඇතුළත් කළ කාල පරාසයන් මෙහි පෙන්වයි...</div>
+
+    <hr>
+
+    <div class="input-group">
+        <label>Business Studies (විනාඩි):</label>
+        <input type="number" id="bsInput" placeholder="0">
+    </div>
+    <div class="input-group">
+        <label>Accounting (විනාඩි):</label>
+        <input type="number" id="accInput" placeholder="0">
+    </div>
+    <div class="input-group">
+        <label>ICT / Econ (විනාඩි):</label>
+        <input type="number" id="ictInput" placeholder="0">
+    </div>
+
+    <button class="btn-calc" onclick="calculateAll()">ගණනය කරන්න</button>
+    <button class="btn-reset" onclick="resetAll()">Reset</button>
+
+    <div id="results-area">
+        <div class="result-item"><span>Business Studies එකතුව:</span> <span id="resBS" class="time-value">පැය 0 විනාඩි 0</span></div>
+        <div class="result-item"><span>Accounting එකතුව:</span> <span id="resAcc" class="time-value">පැය 0 විනාඩි 0</span></div>
+        <div class="result-item"><span>ICT/Econ එකතුව:</span> <span id="resICT" class="time-value">පැය 0 විනාඩි 0</span></div>
+        
+        <hr>
+
+        <div class="result-item">
+            <span class="label-badge blue-bg">මුළු ප්‍රමිතිගත කාලය</span> 
+            <span id="totalStd" class="time-value">පැය 0 විනාඩි 0</span>
+        </div>
+
+        <div class="result-item">
+            <span class="label-badge blue-bg">මුළු සත්‍ය කාලය</span> 
+            <span id="totalAct" class="time-value">පැය 0 විනාඩි 0</span>
+        </div>
+
+        <div class="result-item">
+            <span class="label-badge green-bg">මුළු අක්‍රිය කාලය</span> 
+            <span id="idleRes" class="time-value">පැය 0 විනාඩි 0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let totalShiftMinutes = 0;
+    let shiftCount = 0;
+
+    function formatTime(mins) {
+        let absMins = Math.round(Math.abs(mins));
+        let h = Math.floor(absMins / 60);
+        let m = absMins % 60;
+        return `පැය ${h} විනාඩි ${m}`;
+    }
+
+    function addShift() {
+        let start = document.getElementById("shiftStart").value;
+        let end = document.getElementById("shiftEnd").value;
+        if (!start || !end) return;
+        let startTime = new Date(`2024-01-01 ${start}`);
+        let endTime = new Date(`2024-01-01 ${end}`);
+        if (endTime <= startTime) endTime.setDate(endTime.getDate() + 1);
+        let diff = (endTime - startTime) / (1000 * 60);
+        totalShiftMinutes += diff;
+        shiftCount++;
+        let display = document.getElementById("shiftDisplay");
+        if (shiftCount === 1) display.innerHTML = "";
+        display.innerHTML += `<div>Shift ${shiftCount}: ${start} - ${end} (${formatTime(diff)})</div>`;
+        document.getElementById("totalStd").innerText = formatTime(totalShiftMinutes);
+    }
+
+    function calculateAll() {
+        let bs = parseInt(document.getElementById("bsInput").value) || 0;
+        let acc = parseInt(document.getElementById("accInput").value) || 0;
+        let ict = parseInt(document.getElementById("ictInput").value) || 0;
+        document.getElementById("resBS").innerText = formatTime(bs);
+        document.getElementById("resAcc").innerText = formatTime(acc);
+        document.getElementById("resICT").innerText = formatTime(ict);
+        let totalActual = bs + acc + ict;
+        document.getElementById("totalAct").innerText = formatTime(totalActual);
+        let idle = totalShiftMinutes - totalActual;
+        document.getElementById("idleRes").innerText = (idle < 0 ? "අමතර " : "") + formatTime(idle);
+    }
+
+    function resetAll() {
+        totalShiftMinutes = 0;
+        shiftCount = 0;
+        document.querySelectorAll('input').forEach(i => i.value = "");
+        document.getElementById("shiftDisplay").innerHTML = "ඇතුළත් කළ කාල පරාසයන් මෙහි පෙන්වයි...";
+        document.getElementById("resBS").innerText = "පැය 0 විනාඩි 0";
+        document.getElementById("resAcc").innerText = "පැය 0 විනාඩි 0";
+        document.getElementById("resICT").innerText = "පැය 0 විනාඩි 0";
+        document.getElementById("totalStd").innerText = "පැය 0 විනාඩි 0";
+        document.getElementById("totalAct").innerText = "පැය 0 විනාඩි 0";
+        document.getElementById("idleRes").innerText = "පැය 0 විනාඩි 0";
+    }
+</script>
+
+</body>
+</html>
