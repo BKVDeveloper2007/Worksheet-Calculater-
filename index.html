@@ -97,6 +97,12 @@
         .bar { height: 8px; background: var(--bar-bg); border-radius: 10px; overflow: hidden; }
         .fill { height: 100%; background: var(--yellow); width: 0%; transition: 0.5s; }
 
+        /* --- Countdown New Styles --- */
+        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .c-box { background: var(--bar-bg); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--input-border); }
+        .c-val { font-size: 1.5rem; font-weight: 900; color: var(--yellow); display: block; }
+        .c-lbl { font-size: 0.6rem; color: var(--gray); font-weight: bold; }
+
     </style>
 </head>
 <body>
@@ -181,6 +187,17 @@
 
             <button class="btn-undo" style="border:none; color:#555; margin-top:20px;" onclick="resetAll()">RESET ALL</button>
         </div>
+
+        <div class="card" style="border-color: var(--yellow);">
+            <h2 style="color: var(--yellow);">2026 A/L COUNTDOWN</h2>
+            <div class="countdown-grid">
+                <div class="c-box"><span class="c-val" id="cd-d">00</span><span class="c-lbl">DAYS</span></div>
+                <div class="c-box"><span class="c-val" id="cd-h">00</span><span class="c-lbl">HOURS</span></div>
+                <div class="c-box"><span class="c-val" id="cd-m">00</span><span class="c-lbl">MINS</span></div>
+                <div class="c-box"><span class="c-val" id="cd-s">00</span><span class="c-lbl">SECS</span></div>
+            </div>
+            <p style="text-align: center; font-size: 0.7rem; color: var(--gray); margin-top: 15px;">TARGET DATE: 2026-08-01</p>
+        </div>
     </div>
 
     <script>
@@ -253,6 +270,25 @@
         }
 
         function resetAll() { if(confirm("මකන්නද?")) { totalStd = 0; subjects = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 }; history = []; up(); } }
+
+        // --- Countdown Logic ---
+        function updateCD() {
+            const target = new Date("August 1, 2026 00:00:00").getTime();
+            const now = new Date().getTime();
+            const diff = target - now;
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('cd-d').innerText = d.toString().padStart(2, '0');
+            document.getElementById('cd-h').innerText = h.toString().padStart(2, '0');
+            document.getElementById('cd-m').innerText = m.toString().padStart(2, '0');
+            document.getElementById('cd-s').innerText = s.toString().padStart(2, '0');
+        }
+        setInterval(updateCD, 1000);
+        updateCD();
     </script>
 </body>
 </html>
