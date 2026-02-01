@@ -2,162 +2,257 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <title>Subject Wise Time Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet Calculator</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; background: #f0f2f5; color: #333; }
-        .container { max-width: 550px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        
-        h3 { color: #1a73e8; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .section-title { font-weight: bold; color: #1a73e8; text-align: left; margin: 15px 0 10px 0; font-size: 16px; }
-        
-        .input-group { margin-bottom: 12px; text-align: left; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; color: #555; }
-        input { padding: 10px; width: 100%; box-sizing: border-box; border: 2px solid #dfe1e5; border-radius: 8px; font-size: 16px; transition: 0.3s; }
-        
-        /* Time inputs row */
-        .time-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .time-row div { flex: 1; text-align: left; }
-        
-        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
-        
-        /* බොත්තම කොටු දෙකට යටින් ඒමට සකස් කළ style එක */
-        .btn-add { background: #1a73e8; color: white; width: 100%; margin-top: 5px; margin-bottom: 15px; }
-        
-        .btn-calc { background: #1a73e8; color: white; width: 100%; margin-top: 10px; }
-        .btn-reset { background: #ea4335; color: white; width: 100%; margin-top: 8px; }
-        
-        #results-area { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: left; }
-        .result-item { font-size: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; color: #000; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-        .label-badge {
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            display: inline-block;
+        :root {
+            --bg: #000;
+            --card: #111;
+            --yellow: #ffcc00;
+            --text: #fff;
+            --gray: #888;
+            --border: #222;
+            --input-bg: #1a1a1a;
+            --input-border: #333;
+            --bar-bg: #222;
+            --btn-text: #000;
+            --q-btn-text: #ffcc00;
         }
-        .blue-bg { background: #1a73e8; }
-        .green-bg { background: #34a853; }
 
-        .time-value { font-weight: bold; color: #333; }
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --card: #f5f5f7;
+            --yellow: #ffcc00;
+            --text: #000;
+            --gray: #666;
+            --border: #ddd;
+            --input-bg: #fff;
+            --input-border: #ccc;
+            --bar-bg: #e0e0e0;
+            --btn-text: #000;
+            --q-btn-text: #000000;
+        }
 
-        hr { border: 0; border-top: 1px solid #ddd; margin: 15px 0; }
-        .shift-list { background: #eef4ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; max-height: 120px; overflow-y: auto; text-align: left; font-size: 14px; border-left: 4px solid #1a73e8; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 30px;
+            transition: 0.3s ease;
+        }
+
+        /* --- UI Styles --- */
+        .mode-toggle { display: flex; justify-content: flex-end; padding: 20px 25px 0 0; }
+        .bulb-btn { background: none; border: none; cursor: pointer; font-size: 32px; outline: none; transition: 0.2s; }
+        .bulb-btn:active { transform: scale(0.9); }
+
+        .bulb-off { display: block; filter: grayscale(1); opacity: 0.5; }
+        .bulb-on { display: none; filter: drop-shadow(0 0 10px var(--yellow)); }
+
+        [data-theme="light"] .bulb-off { display: none; }
+        [data-theme="light"] .bulb-on { display: block; }
+
+        header { padding: 10px 20px 30px 20px; text-align: center; }
+        .title { font-size: 2.8rem; font-weight: 900; line-height: 1.1; letter-spacing: -2px; margin: 0; text-transform: uppercase; }
+        .yellow-text { color: var(--yellow); display: block; }
+
+        .container { max-width: 900px; margin: auto; padding: 0 15px; display: grid; gap: 20px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; transition: 0.3s; }
+        h2 { font-size: 1rem; color: var(--gray); text-transform: uppercase; margin-bottom: 20px; }
+
+        .input-box {
+            background: var(--input-bg); border: 1px solid var(--input-border);
+            padding: 12px; border-radius: 12px; color: var(--text);
+            width: 100%; margin-bottom: 15px; box-sizing: border-box;
+        }
+
+        .q-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .q-btn {
+            background: var(--bar-bg); border: 1px solid var(--input-border);
+            color: var(--q-btn-text); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+        .q-btn:hover { background: var(--yellow); color: #000; }
+
+        .btn-main {
+            background: var(--yellow); color: var(--btn-text); border: none;
+            padding: 15px; border-radius: 12px; width: 100%;
+            font-weight: 900; cursor: pointer; text-transform: uppercase;
+        }
+
+        .btn-undo {
+            background: transparent; color: #ff4444; border: 1px solid var(--input-border);
+            margin-top: 10px; padding: 8px; width: 100%; border-radius: 10px; cursor: pointer;
+        }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--yellow); display: block; }
+        .stat-lbl { font-size: 0.7rem; color: var(--gray); }
+
+        .row { margin-bottom: 15px; }
+        .info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+        .bar { height: 8px; background: var(--bar-bg); border-radius: 10px; overflow: hidden; }
+        .fill { height: 100%; background: var(--yellow); width: 0%; transition: 0.5s; }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h3>විෂයයන් අනුව කාලය ගණනය</h3>
-    
-    <div class="section-title">ප්‍රමිතිගත කාල පරාසයන් (Shifts)</div>
-    
-    <div class="time-row">
-        <div><label>ආරම්භය:</label><input type="time" id="shiftStart"></div>
-        <div><label>අවසානය:</label><input type="time" id="shiftEnd"></div>
-    </div>
-    
-    <button class="btn-add" onclick="addShift()">ඇතුළත් කරන්න</button>
-    
-    <div id="shiftDisplay" class="shift-list">ඇතුළත් කළ කාල පරාසයන් මෙහි පෙන්වයි...</div>
-
-    <hr>
-
-    <div class="input-group">
-        <label>Business Studies (විනාඩි):</label>
-        <input type="number" id="bsInput" placeholder="0">
-    </div>
-    <div class="input-group">
-        <label>Accounting (විනාඩි):</label>
-        <input type="number" id="accInput" placeholder="0">
-    </div>
-    <div class="input-group">
-        <label>ICT / Econ (විනාඩි):</label>
-        <input type="number" id="ictInput" placeholder="0">
+    <div class="mode-toggle">
+        <button class="bulb-btn" onclick="toggleMode()">
+            <span class="bulb-off">💡</span>
+            <span class="bulb-on">💡</span>
+        </button>
     </div>
 
-    <button class="btn-calc" onclick="calculateAll()">ගණනය කරන්න</button>
-    <button class="btn-reset" onclick="resetAll()">Reset</button>
+    <header>
+        <div class="title">WORKSHEET <span class="yellow-text">CALCULATOR</span></div>
+    </header>
 
-    <div id="results-area">
-        <div class="result-item"><span>Business Studies එකතුව:</span> <span id="resBS" class="time-value">පැය 0 විනාඩි 0</span></div>
-        <div class="result-item"><span>Accounting එකතුව:</span> <span id="resAcc" class="time-value">පැය 0 විනාඩි 0</span></div>
-        <div class="result-item"><span>ICT/Econ එකතුව:</span> <span id="resICT" class="time-value">පැය 0 විනාඩි 0</span></div>
-        
-        <hr>
-
-        <div class="result-item">
-            <span class="label-badge blue-bg">මුළු ප්‍රමිතිගත කාලය</span> 
-            <span id="totalStd" class="time-value">පැය 0 විනාඩි 0</span>
+    <div class="container">
+        <div class="card">
+            <h2>ප්‍රමිත කාලය (Standard)</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="time" id="stdFrom" class="input-box">
+                <input type="time" id="stdTo" class="input-box">
+            </div>
+            <button class="btn-main" onclick="addStandard()">Range එක එක්කරන්න</button>
         </div>
 
-        <div class="result-item">
-            <span class="label-badge blue-bg">මුළු සත්‍ය කාලය</span> 
-            <span id="totalAct" class="time-value">පැය 0 විනාඩි 0</span>
+        <div class="card">
+            <h2>විෂයන් සහ කාලය</h2>
+            <select id="subName" class="input-box">
+                <option value="Accounting">Accounting</option>
+                <option value="Business Studies">Business Studies</option>
+                <option value="ICT/Econ">ICT/Econ</option>
+            </select>
+
+            <div class="q-grid">
+                <button class="q-btn" onclick="q(60)">1h</button>
+                <button class="q-btn" onclick="q(120)">2h</button>
+                <button class="q-btn" onclick="q(180)">3h</button>
+                <button class="q-btn" onclick="q(5)">5m</button>
+                <button class="q-btn" onclick="q(10)">10m</button>
+                <button class="q-btn" onclick="q(15)">15m</button>
+                <button class="q-btn" onclick="q(20)">20m</button>
+                <button class="q-btn" onclick="q(30)">30m</button>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="h" placeholder="පැය" class="input-box">
+                <input type="number" id="m" placeholder="විනාඩි" class="input-box">
+            </div>
+            <button class="btn-main" onclick="addSubject()">Session එක ඇතුළත් කරන්න</button>
+            <button class="btn-undo" onclick="undo()">අන්තිම එක ඉවත් කරන්න (Undo)</button>
         </div>
 
-        <div class="result-item">
-            <span class="label-badge green-bg">මුළු අක්‍රිය කාලය</span> 
-            <span id="idleRes" class="time-value">පැය 0 විනාඩි 0</span>
+        <div class="card">
+            <h2>සාරාංශය (Analysis)</h2>
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <span class="stat-lbl">ප්‍රමිත කාලය</span>
+                    <span class="stat-val" id="tStd">0h 0m</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-lbl">සත්‍ය කාලය</span>
+                    <span class="stat-val" id="tAct">0h 0m</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-lbl">අක්‍රිය කාලය</span>
+                    <span class="stat-val" id="tIdl" style="color: #ff4444;">0h 0m</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="info"><span>Accounting</span><span id="txtAcc">0h 0m</span></div>
+                <div class="bar"><div id="barAcc" class="fill"></div></div>
+            </div>
+            <div class="row">
+                <div class="info"><span>Business Studies</span><span id="txtBS">0h 0m</span></div>
+                <div class="bar"><div id="barBS" class="fill"></div></div>
+            </div>
+            <div class="row">
+                <div class="info"><span>ICT / Econ</span><span id="txtICT">0h 0m</span></div>
+                <div class="bar"><div id="barICT" class="fill"></div></div>
+            </div>
+
+            <button class="btn-undo" style="border:none; color:#555; margin-top:20px;" onclick="resetAll()">RESET ALL</button>
         </div>
     </div>
-</div>
 
-<script>
-    let totalShiftMinutes = 0;
-    let shiftCount = 0;
+    <script>
+        function toggleMode() {
+            const root = document.documentElement;
+            const currentTheme = root.getAttribute('data-theme');
+            root.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
+        }
 
-    function formatTime(mins) {
-        let absMins = Math.round(Math.abs(mins));
-        let h = Math.floor(absMins / 60);
-        let m = absMins % 60;
-        return `පැය ${h} විනාඩි ${m}`;
-    }
+        let totalStd = 0;
+        let subjects = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 };
+        let history = [];
 
-    function addShift() {
-        let start = document.getElementById("shiftStart").value;
-        let end = document.getElementById("shiftEnd").value;
-        if (!start || !end) return;
-        let startTime = new Date(`2024-01-01 ${start}`);
-        let endTime = new Date(`2024-01-01 ${end}`);
-        if (endTime <= startTime) endTime.setDate(endTime.getDate() + 1);
-        let diff = (endTime - startTime) / (1000 * 60);
-        totalShiftMinutes += diff;
-        shiftCount++;
-        let display = document.getElementById("shiftDisplay");
-        if (shiftCount === 1) display.innerHTML = "";
-        display.innerHTML += `<div>Shift ${shiftCount}: ${start} - ${end} (${formatTime(diff)})</div>`;
-        document.getElementById("totalStd").innerText = formatTime(totalShiftMinutes);
-    }
+        function q(mins) {
+            let ch = parseInt(document.getElementById('h').value || 0);
+            let cm = parseInt(document.getElementById('m').value || 0);
+            let tot = (ch * 60) + cm + mins;
+            document.getElementById('h').value = Math.floor(tot / 60) || '';
+            document.getElementById('m').value = tot % 60 || '';
+        }
 
-    function calculateAll() {
-        let bs = parseInt(document.getElementById("bsInput").value) || 0;
-        let acc = parseInt(document.getElementById("accInput").value) || 0;
-        let ict = parseInt(document.getElementById("ictInput").value) || 0;
-        document.getElementById("resBS").innerText = formatTime(bs);
-        document.getElementById("resAcc").innerText = formatTime(acc);
-        document.getElementById("resICT").innerText = formatTime(ict);
-        let totalActual = bs + acc + ict;
-        document.getElementById("totalAct").innerText = formatTime(totalActual);
-        let idle = totalShiftMinutes - totalActual;
-        document.getElementById("idleRes").innerText = (idle < 0 ? "අමතර " : "") + formatTime(idle);
-    }
+        function addStandard() {
+            const f = document.getElementById('stdFrom').value;
+            const t = document.getElementById('stdTo').value;
+            if(!f || !t) return;
+            let d = (new Date(`2026-01-01T${t}`) - new Date(`2026-01-01T${f}`)) / 60000;
+            if(d < 0) d += 1440;
+            totalStd += d;
+            up();
+        }
 
-    function resetAll() {
-        totalShiftMinutes = 0;
-        shiftCount = 0;
-        document.querySelectorAll('input').forEach(i => i.value = "");
-        document.getElementById("shiftDisplay").innerHTML = "ඇතුළත් කළ කාල පරාසයන් මෙහි පෙන්වයි...";
-        document.getElementById("resBS").innerText = "පැය 0 විනාඩි 0";
-        document.getElementById("resAcc").innerText = "පැය 0 විනාඩි 0";
-        document.getElementById("resICT").innerText = "පැය 0 විනාඩි 0";
-        document.getElementById("totalStd").innerText = "පැය 0 විනාඩි 0";
-        document.getElementById("totalAct").innerText = "පැය 0 විනාඩි 0";
-        document.getElementById("idleRes").innerText = "පැය 0 විනාඩි 0";
-    }
-</script>
+        function addSubject() {
+            const name = document.getElementById('subName').value;
+            const hr = parseInt(document.getElementById('h').value || 0);
+            const mi = parseInt(document.getElementById('m').value || 0);
+            const total = (hr * 60) + mi;
+            if(total <= 0) return;
+            subjects[name] += total;
+            history.push({ name, total });
+            document.getElementById('h').value = '';
+            document.getElementById('m').value = '';
+            up();
+        }
 
+        function undo() {
+            if(history.length === 0) return;
+            const last = history.pop();
+            subjects[last.name] -= last.total;
+            up();
+        }
+
+        function fmt(mins) {
+            const h = Math.floor(Math.abs(mins) / 60);
+            const m = Math.floor(Math.abs(mins) % 60);
+            return `${mins < 0 ? '-' : ''}${h}h ${m}m`;
+        }
+
+        function up() {
+            document.getElementById('tStd').innerText = fmt(totalStd);
+            let act = subjects["Accounting"] + subjects["Business Studies"] + subjects["ICT/Econ"];
+            document.getElementById('tAct').innerText = fmt(act);
+            document.getElementById('tIdl').innerText = fmt(totalStd - act);
+
+            const map = { "Accounting": "Acc", "Business Studies": "BS", "ICT/Econ": "ICT" };
+            for(let s in subjects) {
+                document.getElementById(`txt${map[s]}`).innerText = fmt(subjects[s]);
+                let p = totalStd > 0 ? (subjects[s] / totalStd) * 100 : 0;
+                document.getElementById(`bar${map[s]}`).style.width = Math.min(p, 100) + "%";
+            }
+        }
+
+        function resetAll() { if(confirm("මකන්නද?")) { totalStd = 0; subjects = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 }; history = []; up(); } }
+    </script>
 </body>
 </html>
