@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worksheet Calculator</title>
+    <title>A/L Worksheet Calculator Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
         :root {
             --bg: #000;
@@ -18,7 +20,7 @@
             --input-border: #333;
             --bar-bg: #222;
             --btn-text: #000;
-            --q-btn-text: #ffcc00;
+            --danger: #ff4d4d;
         }
 
         [data-theme="light"] {
@@ -32,263 +34,541 @@
             --input-border: #ccc;
             --bar-bg: #e0e0e0;
             --btn-text: #000;
-            --q-btn-text: #000000;
         }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding-bottom: 30px;
-            transition: 0.3s ease;
-        }
-
-        /* --- UI Styles --- */
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 30px; transition: 0.3s ease; }
+        
+        /* Main UI Styles */
         .mode-toggle { display: flex; justify-content: flex-end; padding: 20px 25px 0 0; }
-        .bulb-btn { background: none; border: none; cursor: pointer; font-size: 32px; outline: none; transition: 0.2s; }
+        .bulb-btn { background: none; border: none; cursor: pointer; font-size: 24px; outline: none; transition: 0.2s; color: var(--yellow); }
         .bulb-btn:active { transform: scale(0.9); }
 
-        .bulb-off { display: block; filter: grayscale(1); opacity: 0.5; }
-        .bulb-on { display: none; filter: drop-shadow(0 0 10px var(--yellow)); }
-
-        [data-theme="light"] .bulb-off { display: none; }
-        [data-theme="light"] .bulb-on { display: block; }
-
-        header { padding: 10px 20px 30px 20px; text-align: center; }
-        .title { font-size: 2.8rem; font-weight: 900; line-height: 1.1; letter-spacing: -2px; margin: 0; text-transform: uppercase; }
+        header { padding: 0 20px 20px 20px; text-align: center; }
+        .title { font-size: 2.5rem; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin: 0; text-transform: uppercase; }
         .yellow-text { color: var(--yellow); display: block; }
+
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; padding: 0 15px; flex-wrap: wrap; }
+        .tab-btn { background: var(--card); color: var(--gray); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .tab-btn:hover { color: var(--text); border-color: var(--gray); }
+        .tab-btn.active { background: var(--yellow); color: var(--btn-text); border-color: var(--yellow); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .container { max-width: 900px; margin: auto; padding: 0 15px; display: grid; gap: 20px; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; transition: 0.3s; }
-        h2 { font-size: 1rem; color: var(--gray); text-transform: uppercase; margin-bottom: 20px; }
+        h2 { font-size: 1rem; color: var(--gray); text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        h2 i { color: var(--yellow); }
 
-        .input-box {
-            background: var(--input-bg); border: 1px solid var(--input-border);
-            padding: 12px; border-radius: 12px; color: var(--text);
-            width: 100%; margin-bottom: 15px; box-sizing: border-box;
-        }
+        .input-box { background: var(--input-bg); border: 1px solid var(--input-border); padding: 12px; border-radius: 12px; color: var(--text); width: 100%; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
+        .row-flex { display: flex; gap: 10px; align-items: center; }
+        .col { flex: 1; }
+        label { font-size: 0.8rem; color: var(--gray); display: block; margin-bottom: 5px; font-weight: bold; }
 
-        .q-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .q-btn {
-            background: var(--bar-bg); border: 1px solid var(--input-border);
-            color: var(--q-btn-text); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold;
-        }
-        .q-btn:hover { background: var(--yellow); color: #000; }
+        .btn-main { background: var(--yellow); color: var(--btn-text); border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-main:active { transform: scale(0.98); }
+        .btn-secondary { background: var(--bar-bg); color: var(--text); border: 1px solid var(--input-border); padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-secondary:hover { border-color: var(--yellow); color: var(--yellow); }
+        .btn-danger { background: transparent; color: var(--danger); border: none; cursor: pointer; font-size: 1.1rem; transition: 0.2s; padding: 5px; }
+        .btn-danger:hover { transform: scale(1.1); color: #ff1a1a; }
 
-        .btn-main {
-            background: var(--yellow); color: var(--btn-text); border: none;
-            padding: 15px; border-radius: 12px; width: 100%;
-            font-weight: 900; cursor: pointer; text-transform: uppercase;
-        }
-
-        .btn-undo {
-            background: transparent; color: #ff4444; border: 1px solid var(--input-border);
-            margin-top: 10px; padding: 8px; width: 100%; border-radius: 10px; cursor: pointer;
-        }
-
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .stat-box { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
         .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--yellow); display: block; }
-        .stat-lbl { font-size: 0.7rem; color: var(--gray); }
+        .stat-lbl { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; }
+
+        .task-list { margin-top: 15px; padding: 10px; background: var(--bg); border-radius: 12px; border: 1px dashed var(--input-border); font-size: 0.85rem; max-height: 150px; overflow-y: auto; }
+        .task-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--gray); align-items: center;}
+        .task-item:last-child { border-bottom: none; }
+        .task-hl { color: var(--yellow); font-weight: bold; }
 
         .row { margin-bottom: 15px; }
-        .info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+        .info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
         .bar { height: 8px; background: var(--bar-bg); border-radius: 10px; overflow: hidden; }
         .fill { height: 100%; background: var(--yellow); width: 0%; transition: 0.5s; }
 
-        /* --- Countdown New Styles --- */
-        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-        .c-box { background: var(--bar-bg); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--input-border); }
-        .c-val { font-size: 1.5rem; font-weight: 900; color: var(--yellow); display: block; }
-        .c-lbl { font-size: 0.6rem; color: var(--gray); font-weight: bold; }
+        .history-day { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .h-date { font-weight: 900; color: var(--yellow); margin-bottom: 10px; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .h-block { margin-top: 10px; padding: 10px; background: var(--bar-bg); border-radius: 8px; }
+        .h-block-title { font-size: 0.85rem; color: var(--text); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between;}
+        
+        .calc-screen { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text); padding: 20px; text-align: right; font-size: 2rem; font-weight: 900; border-radius: 12px; margin-bottom: 15px; min-height: 45px; overflow-x: auto; white-space: nowrap; letter-spacing: 2px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .calc-btn { background: var(--bar-bg); color: var(--text); border: 1px solid var(--border); padding: 20px 0; font-size: 1.4rem; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        .calc-btn:hover { background: var(--input-bg); }
+        .calc-btn:active { transform: scale(0.95); }
+        .btn-op { color: var(--yellow); border-color: var(--border); font-size: 1.6rem; }
+        .btn-eq { background: var(--yellow); color: #000; grid-column: span 4; font-size: 1.5rem; }
+        .calc-result { background: var(--bg); border: 1px dashed var(--yellow); color: var(--yellow); padding: 15px; text-align: center; font-size: 1.5rem; font-weight: 900; border-radius: 12px; margin-top: 15px; }
 
+        /* =========================================
+           PRINT SPECIFIC STYLES (Balanced Layout)
+           ========================================= */
+        #printArea { display: none; }
+
+        @media print {
+            @page { size: landscape; margin: 12mm; } /* Forces Landscape and sets margins */
+
+            /* Hide everything else */
+            .mode-toggle, header, .tabs, .tab-content { display: none !important; }
+            body { background: #fff !important; margin: 0; padding: 0; }
+            
+            /* Show only the print area */
+            #printArea { display: block !important; width: 100%; color: #000; background: #fff; }
+            
+            /* Print Header */
+            #printArea h2 { text-align: center; text-transform: uppercase; margin-bottom: 15px; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            
+            /* Print Table - Fixed Layout for perfect balance */
+            #printArea table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; color: #000; table-layout: fixed; }
+            #printArea th, #printArea td { border: 1px solid #000; padding: 8px 4px; word-wrap: break-word; vertical-align: middle; }
+            
+            /* Column Width Percentages for perfect balance */
+            #printArea th:nth-child(1) { width: 10%; } /* Date */
+            #printArea th:nth-child(2) { width: 12%; } /* Standard Time */
+            #printArea th:nth-child(3) { width: 26%; } /* Task Finished */
+            #printArea th:nth-child(4) { width: 12%; } /* Elapsed Time */
+            #printArea th:nth-child(5) { width: 8%; }  /* Acc */
+            #printArea th:nth-child(6) { width: 8%; }  /* BS */
+            #printArea th:nth-child(7) { width: 8%; }  /* IT/Econ */
+            #printArea th:nth-child(8) { width: 8%; }  /* Actual */
+            #printArea th:nth-child(9) { width: 8%; }  /* Idle */
+
+            /* Force exact colors in printing */
+            #printArea th { background-color: #d9d9d9 !important; color: #000 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #printArea .day-total td { background-color: #111 !important; color: #fff !important; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #printArea .week-total td { background-color: #d9d9d9 !important; color: #000 !important; font-weight: bold; font-size: 12px; border-top: 2px solid #000; border-bottom: 2px solid #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            #printArea .task-name { text-align: left; padding-left: 8px; }
+            #printArea .spacer-row td { border: none !important; height: 15px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="mode-toggle">
-        <button class="bulb-btn" onclick="toggleMode()">
-            <span class="bulb-off">💡</span>
-            <span class="bulb-on">💡</span>
-        </button>
+        <button class="bulb-btn" onclick="toggleMode()"><i class="fa-solid fa-lightbulb"></i></button>
     </div>
 
     <header>
-        <div class="title">WORKSHEET <span class="yellow-text">CALCULATOR</span></div>
+        <div class="title">WORKSHEET <span class="yellow-text">PRO</span></div>
     </header>
 
-    <div class="container">
-        <div class="card">
-            <h2>ප්‍රමිත කාලය (Standard)</h2>
-            <div style="display: flex; gap: 10px;">
-                <input type="time" id="stdFrom" class="input-box">
-                <input type="time" id="stdTo" class="input-box">
-            </div>
-            <button class="btn-main" onclick="addStandard()">Range එක එක්කරන්න</button>
-        </div>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="tab-btn" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+        <button class="tab-btn" onclick="switchTab('calculator')"><i class="fa-solid fa-calculator"></i> Calculator</button>
+    </div>
 
-        <div class="card">
-            <h2>විෂයන් සහ කාලය</h2>
-            <select id="subName" class="input-box">
-                <option value="Accounting">Accounting</option>
-                <option value="Business Studies">Business Studies</option>
-                <option value="ICT/Econ">ICT/Econ</option>
-            </select>
-
-            <div class="q-grid">
-                <button class="q-btn" onclick="q(60)">1h</button>
-                <button class="q-btn" onclick="q(120)">2h</button>
-                <button class="q-btn" onclick="q(180)">3h</button>
-                <button class="q-btn" onclick="q(5)">5m</button>
-                <button class="q-btn" onclick="q(10)">10m</button>
-                <button class="q-btn" onclick="q(15)">15m</button>
-                <button class="q-btn" onclick="q(20)">20m</button>
-                <button class="q-btn" onclick="q(30)">30m</button>
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <input type="number" id="h" placeholder="පැය" class="input-box">
-                <input type="number" id="m" placeholder="විනාඩි" class="input-box">
-            </div>
-            <button class="btn-main" onclick="addSubject()">Session එක ඇතුළත් කරන්න</button>
-            <button class="btn-undo" onclick="undo()">අන්තිම එක ඉවත් කරන්න (Undo)</button>
-        </div>
-
-        <div class="card">
-            <h2>සාරාංශය (Analysis)</h2>
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <span class="stat-lbl">ප්‍රමිත කාලය</span>
-                    <span class="stat-val" id="tStd">0h 0m</span>
+    <div id="tab-home" class="tab-content active">
+        <div class="container">
+            <div class="card">
+                <h2><i class="fa-solid fa-stopwatch"></i> 1. ප්‍රමිත කාලය (Standard Time)</h2>
+                <div class="row-flex"><div class="col"><label>දිනය (Date)</label><input type="date" id="workDate" class="input-box"></div></div>
+                <div class="row-flex">
+                    <div class="col"><label>ආරම්භය (From)</label><input type="time" id="stdFrom" class="input-box"></div>
+                    <div class="col"><label>අවසානය (To)</label><input type="time" id="stdTo" class="input-box"></div>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-lbl">සත්‍ය කාලය</span>
-                    <span class="stat-val" id="tAct">0h 0m</span>
+                <button class="btn-main" onclick="startStandardBlock()"><i class="fa-solid fa-play"></i> පටන් ගන්න</button>
+                <p id="currBlockTxt" style="text-align:center; color:var(--yellow); font-size:0.9rem; margin-top:10px; display:none; font-weight:bold;"></p>
+            </div>
+
+            <div class="card" id="taskCard" style="opacity: 0.5; pointer-events: none;">
+                <h2><i class="fa-solid fa-list-check"></i> 2. කාර්යයන් (Tasks)</h2>
+                <input type="text" id="taskName" placeholder="උදා: Past paper 2020 Part 1" class="input-box">
+                <div class="row-flex">
+                    <div class="col"><label>ආරම්භය (Start)</label><input type="time" id="taskStart" class="input-box"></div>
+                    <div class="col"><label>අවසානය (End)</label><input type="time" id="taskEnd" class="input-box"></div>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-lbl">අක්‍රිය කාලය</span>
-                    <span class="stat-val" id="tIdl" style="color: #ff4444;">0h 0m</span>
+                <label>විෂය (Subject)</label>
+                <select id="subName" class="input-box">
+                    <option value="Accounting">Accounting (SUB 01)</option>
+                    <option value="Business Studies">Business Studies (SUB 02)</option>
+                    <option value="ICT/Econ">ICT/Econ (SUB 03)</option>
+                </select>
+                <button class="btn-main" style="background: #fff; color: #000;" onclick="addTask()"><i class="fa-solid fa-plus"></i> Task එකතු කරන්න</button>
+                <div id="taskList" class="task-list">අතරමැද කාර්යයන් මෙහි පෙන්වයි...</div>
+                <button class="btn-secondary" onclick="finishStandardBlock()"><i class="fa-solid fa-check-double"></i> ප්‍රමිත කාලය අවසන් කරන්න</button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fa-solid fa-chart-pie"></i> 3. දවසේ සාරාංශය (Daily Preview)</h2>
+                <div class="stat-grid">
+                    <div class="stat-box"><span class="stat-lbl">ප්‍රමිත කාලය</span><span class="stat-val" id="tStd">0h 0m</span></div>
+                    <div class="stat-box"><span class="stat-lbl">සත්‍ය කාලය</span><span class="stat-val" id="tAct">0h 0m</span></div>
+                    <div class="stat-box"><span class="stat-lbl">අක්‍රිය කාලය</span><span class="stat-val" id="tIdl" style="color: var(--danger);">0h 0m</span></div>
+                </div>
+                <div class="row"><div class="info"><span>Accounting</span><span id="txtAcc">0h 0m</span></div><div class="bar"><div id="barAcc" class="fill"></div></div></div>
+                <div class="row"><div class="info"><span>Business Studies</span><span id="txtBS">0h 0m</span></div><div class="bar"><div id="barBS" class="fill"></div></div></div>
+                <div class="row"><div class="info"><span>ICT / Econ</span><span id="txtICT">0h 0m</span></div><div class="bar"><div id="barICT" class="fill"></div></div></div>
+                <button class="btn-main" style="margin-top:20px;" onclick="saveDay()"><i class="fa-solid fa-floppy-disk"></i> Data Save කරන්න</button>
+            </div>
+
+            <div class="card" style="border-color: var(--yellow);">
+                <h2 style="color: var(--yellow);"><i class="fa-solid fa-print"></i> 4. Reports (Print or Save as PDF)</h2>
+                <div class="row-flex" style="margin-bottom:10px;">
+                    <div class="col"><label>සිට (From)</label><input type="date" id="pdfStart" class="input-box"></div>
+                    <div class="col"><label>දක්වා (To)</label><input type="date" id="pdfEnd" class="input-box"></div>
+                </div>
+                <div class="row-flex">
+                    <button class="btn-secondary" onclick="generateAndPrint('range')"><i class="fa-solid fa-calendar-days"></i> තෝරාගත් දින</button>
+                    <button class="btn-main" onclick="generateAndPrint('all')"><i class="fa-solid fa-print"></i> සියලුම දින Print</button>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="info"><span>Accounting</span><span id="txtAcc">0h 0m</span></div>
-                <div class="bar"><div id="barAcc" class="fill"></div></div>
-            </div>
-            <div class="row">
-                <div class="info"><span>Business Studies</span><span id="txtBS">0h 0m</span></div>
-                <div class="bar"><div id="barBS" class="fill"></div></div>
-            </div>
-            <div class="row">
-                <div class="info"><span>ICT / Econ</span><span id="txtICT">0h 0m</span></div>
-                <div class="bar"><div id="barICT" class="fill"></div></div>
-            </div>
-
-            <button class="btn-undo" style="border:none; color:#555; margin-top:20px;" onclick="resetAll()">RESET ALL</button>
-        </div>
-
-        <div class="card" style="border-color: var(--yellow);">
-            <h2 style="color: var(--yellow);">2026 A/L COUNTDOWN</h2>
-            <div class="countdown-grid">
-                <div class="c-box"><span class="c-val" id="cd-d">00</span><span class="c-lbl">DAYS</span></div>
-                <div class="c-box"><span class="c-val" id="cd-h">00</span><span class="c-lbl">HOURS</span></div>
-                <div class="c-box"><span class="c-val" id="cd-m">00</span><span class="c-lbl">MINS</span></div>
-                <div class="c-box"><span class="c-val" id="cd-s">00</span><span class="c-lbl">SECS</span></div>
-            </div>
-            <p style="text-align: center; font-size: 0.7rem; color: var(--gray); margin-top: 15px;">TARGET DATE: 2026-08-01</p>
         </div>
     </div>
+
+    <div id="tab-history" class="tab-content">
+        <div class="container">
+            <div class="card">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> සුරැකි දත්ත ඉතිහාසය (History)</h2>
+                <p style="font-size:0.8rem; color:var(--gray);">මෙතැනින් ඔබට වැරදිලා ඇතුළත් වුණු දත්ත මකා (Delete) දැමිය හැක. මකා දැමූ පසු කාලයන් ස්වයංක්‍රීයව වෙනස් වේ.</p>
+                <div id="historyContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-calculator" class="tab-content">
+        <div class="container">
+            <div class="card" style="padding-bottom: 25px;">
+                <h2><i class="fa-solid fa-calculator"></i> Time Math (Smart Calculator)</h2>
+                <div id="calcScreen" class="calc-screen">0h 0m</div>
+                <div class="calc-grid">
+                    <button class="calc-btn" onclick="cp('7')">7</button>
+                    <button class="calc-btn" onclick="cp('8')">8</button>
+                    <button class="calc-btn" onclick="cp('9')">9</button>
+                    <button class="calc-btn btn-op" style="color:var(--danger);" onclick="cp('AC')">AC</button>
+                    <button class="calc-btn" onclick="cp('4')">4</button>
+                    <button class="calc-btn" onclick="cp('5')">5</button>
+                    <button class="calc-btn" onclick="cp('6')">6</button>
+                    <button class="calc-btn btn-op" style="color:var(--danger);" onclick="cp('DEL')"><i class="fa-solid fa-delete-left"></i></button>
+                    <button class="calc-btn" onclick="cp('1')">1</button>
+                    <button class="calc-btn" onclick="cp('2')">2</button>
+                    <button class="calc-btn" onclick="cp('3')">3</button>
+                    <button class="calc-btn btn-op" onclick="cp('+')"><i class="fa-solid fa-plus"></i></button>
+                    <button class="calc-btn btn-op" onclick="cp('h')">h</button>
+                    <button class="calc-btn" onclick="cp('0')">0</button>
+                    <button class="calc-btn btn-op" onclick="cp('m')">m</button>
+                    <button class="calc-btn btn-op" onclick="cp('-')"><i class="fa-solid fa-minus"></i></button>
+                    <button class="calc-btn btn-eq" onclick="cp('=')"><i class="fa-solid fa-equals"></i> ගණනය කරන්න</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2><i class="fa-solid fa-percent"></i> Custom Time Math (උදා: 12.65 = 13h 5m)</h2>
+                <label>අගය ලබා දෙන්න (තිතට පෙර පැය, තිතට පසු විනාඩි)</label>
+                <input type="text" id="decInput" class="input-box" placeholder="උදා: 12.65">
+                <button class="btn-main" onclick="calculateDecimal()"><i class="fa-solid fa-equals"></i> හරවන්න</button>
+                <div id="decResult" class="calc-result">0h 0m</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="printArea"></div>
 
     <script>
         function toggleMode() {
             const root = document.documentElement;
-            const currentTheme = root.getAttribute('data-theme');
-            root.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
+            root.setAttribute('data-theme', root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
         }
 
-        let totalStd = 0;
-        let subjects = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 };
-        let history = [];
-
-        function q(mins) {
-            let ch = parseInt(document.getElementById('h').value || 0);
-            let cm = parseInt(document.getElementById('m').value || 0);
-            let tot = (ch * 60) + cm + mins;
-            document.getElementById('h').value = Math.floor(tot / 60) || '';
-            document.getElementById('m').value = tot % 60 || '';
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(tabId === 'history') renderHistory();
         }
 
-        function addStandard() {
-            const f = document.getElementById('stdFrom').value;
-            const t = document.getElementById('stdTo').value;
-            if(!f || !t) return;
-            let d = (new Date(`2026-01-01T${t}`) - new Date(`2026-01-01T${f}`)) / 60000;
-            if(d < 0) d += 1440;
-            totalStd += d;
-            up();
-        }
+        let currentBlock = null; 
+        let dayBlocks = [];
+        let historyDB = JSON.parse(localStorage.getItem('alWorksheetDB')) || [];
+        let subTotals = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 };
 
-        function addSubject() {
-            const name = document.getElementById('subName').value;
-            const hr = parseInt(document.getElementById('h').value || 0);
-            const mi = parseInt(document.getElementById('m').value || 0);
-            const total = (hr * 60) + mi;
-            if(total <= 0) return;
-            subjects[name] += total;
-            history.push({ name, total });
-            document.getElementById('h').value = '';
-            document.getElementById('m').value = '';
-            up();
-        }
+        document.getElementById('workDate').valueAsDate = new Date();
+        document.getElementById('pdfEnd').valueAsDate = new Date();
+        let lastWeek = new Date(); lastWeek.setDate(lastWeek.getDate() - 7);
+        document.getElementById('pdfStart').valueAsDate = lastWeek;
 
-        function undo() {
-            if(history.length === 0) return;
-            const last = history.pop();
-            subjects[last.name] -= last.total;
-            up();
+        function getMins(start, end) {
+            let s = start.split(':'), e = end.split(':');
+            let d = new Date(), sT = new Date(d.getFullYear(), d.getMonth(), d.getDate(), s[0], s[1]), eT = new Date(d.getFullYear(), d.getMonth(), d.getDate(), e[0], e[1]);
+            if(eT < sT) eT.setDate(eT.getDate() + 1); 
+            return Math.floor((eT - sT) / 60000);
         }
-
+        
         function fmt(mins) {
-            const h = Math.floor(Math.abs(mins) / 60);
-            const m = Math.floor(Math.abs(mins) % 60);
+            let h = Math.floor(Math.abs(mins) / 60), m = Math.floor(Math.abs(mins) % 60);
             return `${mins < 0 ? '-' : ''}${h}h ${m}m`;
         }
 
-        function up() {
-            document.getElementById('tStd').innerText = fmt(totalStd);
-            let act = subjects["Accounting"] + subjects["Business Studies"] + subjects["ICT/Econ"];
-            document.getElementById('tAct').innerText = fmt(act);
-            document.getElementById('tIdl').innerText = fmt(totalStd - act);
+        function startStandardBlock() {
+            let d = document.getElementById('workDate').value, f = document.getElementById('stdFrom').value, t = document.getElementById('stdTo').value;
+            if(!d || !f || !t) return alert("කරුණාකර දිනය සහ වේලාවන් ලබා දෙන්න!");
+            currentBlock = { date: d, start: f, end: t, totalMins: getMins(f, t), tasks: [] };
+            document.getElementById('currBlockTxt').style.display = 'block';
+            document.getElementById('currBlockTxt').innerText = `Active: ${f} සිට ${t} දක්වා`;
+            document.getElementById('taskCard').style.opacity = '1';
+            document.getElementById('taskCard').style.pointerEvents = 'auto';
+            updateUI();
+        }
 
-            const map = { "Accounting": "Acc", "Business Studies": "BS", "ICT/Econ": "ICT" };
-            for(let s in subjects) {
-                document.getElementById(`txt${map[s]}`).innerText = fmt(subjects[s]);
-                let p = totalStd > 0 ? (subjects[s] / totalStd) * 100 : 0;
-                document.getElementById(`bar${map[s]}`).style.width = Math.min(p, 100) + "%";
+        function addTask() {
+            if(!currentBlock) return alert("පළමුව ප්‍රමිත කාලයක් පටන් ගන්න!");
+            let n = document.getElementById('taskName').value || "Task";
+            let s = document.getElementById('taskStart').value, e = document.getElementById('taskEnd').value;
+            let sub = document.getElementById('subName').value;
+            if(!s || !e) return alert("Task එක සඳහා වේලාවන් ලබා දෙන්න!");
+            let mins = getMins(s, e);
+            currentBlock.tasks.push({ id: Date.now(), name: n, start: s, end: e, mins: mins, sub: sub });
+            subTotals[sub] += mins;
+            document.getElementById('taskName').value = ""; document.getElementById('taskStart').value = ""; document.getElementById('taskEnd').value = "";
+            renderTaskList(); updateUI();
+        }
+
+        function renderTaskList() {
+            let list = document.getElementById('taskList');
+            list.innerHTML = "";
+            if(currentBlock && currentBlock.tasks.length > 0) {
+                currentBlock.tasks.forEach((t) => {
+                    list.innerHTML += `<div class="task-item">
+                        <span>${t.name} <span style="font-size:0.7rem;color:var(--gray)">(${t.sub})</span></span>
+                        <span class="task-hl">${t.start} - ${t.end} [${fmt(t.mins)}]</span>
+                    </div>`;
+                });
+            } else { list.innerHTML = "අතරමැද කාර්යයන් මෙහි පෙන්වයි..."; }
+        }
+
+        function finishStandardBlock() {
+            if(!currentBlock) return;
+            dayBlocks.push(currentBlock);
+            currentBlock = null;
+            document.getElementById('taskCard').style.opacity = '0.5';
+            document.getElementById('taskCard').style.pointerEvents = 'none';
+            document.getElementById('currBlockTxt').style.display = 'none';
+            document.getElementById('stdFrom').value = ""; document.getElementById('stdTo').value = "";
+            renderTaskList(); updateUI();
+        }
+
+        function updateUI() {
+            let tStd = 0, tAct = 0;
+            dayBlocks.forEach(b => { tStd += b.totalMins; b.tasks.forEach(t => tAct += t.mins); });
+            if(currentBlock) { tStd += currentBlock.totalMins; currentBlock.tasks.forEach(t => tAct += t.mins); }
+            document.getElementById('tStd').innerText = fmt(tStd);
+            document.getElementById('tAct').innerText = fmt(tAct);
+            document.getElementById('tIdl').innerText = fmt(tStd - tAct);
+            const m = { "Accounting": "Acc", "Business Studies": "BS", "ICT/Econ": "ICT" };
+            for(let s in subTotals) {
+                document.getElementById(`txt${m[s]}`).innerText = fmt(subTotals[s]);
+                document.getElementById(`bar${m[s]}`).style.width = tStd > 0 ? Math.min((subTotals[s] / tStd) * 100, 100) + "%" : "0%";
             }
         }
 
-        function resetAll() { if(confirm("මකන්නද?")) { totalStd = 0; subjects = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 }; history = []; up(); } }
-
-        // --- Countdown Logic ---
-        function updateCD() {
-            const target = new Date("August 1, 2026 00:00:00").getTime();
-            const now = new Date().getTime();
-            const diff = target - now;
-
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('cd-d').innerText = d.toString().padStart(2, '0');
-            document.getElementById('cd-h').innerText = h.toString().padStart(2, '0');
-            document.getElementById('cd-m').innerText = m.toString().padStart(2, '0');
-            document.getElementById('cd-s').innerText = s.toString().padStart(2, '0');
+        function saveDay() {
+            if(dayBlocks.length === 0) return alert("දවසට කිසිදු ප්‍රමිත කාලයක් එකතු කර නැත!");
+            let tStd = 0, tAct = 0;
+            dayBlocks.forEach(b => { tStd += b.totalMins; b.tasks.forEach(t => tAct += t.mins); });
+            historyDB.unshift({ id: Date.now(), date: document.getElementById('workDate').value, blocks: JSON.parse(JSON.stringify(dayBlocks)), totStd: tStd, totAct: tAct, totIdl: tStd - tAct });
+            localStorage.setItem('alWorksheetDB', JSON.stringify(historyDB));
+            dayBlocks = []; subTotals = { "Accounting": 0, "Business Studies": 0, "ICT/Econ": 0 };
+            updateUI(); alert("Data Save විය! History/Reports බලන්න.");
         }
-        setInterval(updateCD, 1000);
-        updateCD();
+
+        function renderHistory() {
+            let cont = document.getElementById('historyContainer');
+            cont.innerHTML = "";
+            if(historyDB.length === 0) { cont.innerHTML = "<p style='text-align:center;color:var(--gray)'>කිසිදු දත්තයක් තවම සුරැකී නැත.</p>"; return; }
+            historyDB.forEach((day, dIdx) => {
+                let html = `<div class="history-day">
+                    <div class="h-date">${day.date} 
+                        <span style="font-size:0.8rem; color:var(--gray); font-weight:normal;">
+                            <span style="color:var(--yellow)">Pramitha:</span> ${fmt(day.totStd)} | 
+                            <span style="color:#2ecc71">Sathya:</span> ${fmt(day.totAct)} | 
+                            <span style="color:var(--danger)">Akriya:</span> ${fmt(day.totIdl)}
+                        </span>
+                        <button class="btn-danger" onclick="deleteDay(${dIdx})"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>`;
+                day.blocks.forEach((block, bIdx) => {
+                    html += `<div class="h-block">
+                        <div class="h-block-title">
+                            <span><i class="fa-solid fa-stopwatch"></i> ${block.start} - ${block.end} [${fmt(block.totalMins)}]</span>
+                            <button class="btn-danger" style="font-size:0.9rem;" onclick="deleteBlock(${dIdx}, ${bIdx})"><i class="fa-solid fa-folder-minus"></i></button>
+                        </div>`;
+                    block.tasks.forEach((task, tIdx) => {
+                        html += `<div class="task-item" style="border-color:#444;">
+                            <span><i class="fa-solid fa-check" style="color:var(--gray);font-size:0.7rem;"></i> ${task.name} (${task.sub})</span>
+                            <div>
+                                <span class="task-hl" style="margin-right:10px;">${task.start}-${task.end} [${fmt(task.mins)}]</span>
+                                <button class="btn-danger" style="font-size:0.8rem;" onclick="deleteTask(${dIdx}, ${bIdx}, ${tIdx})"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                });
+                html += `</div>`;
+                cont.innerHTML += html;
+            });
+        }
+
+        function recalcDay(dIdx) {
+            let day = historyDB[dIdx];
+            day.totStd = 0; day.totAct = 0;
+            day.blocks.forEach(b => { day.totStd += b.totalMins; b.tasks.forEach(t => day.totAct += t.mins); });
+            day.totIdl = day.totStd - day.totAct;
+            localStorage.setItem('alWorksheetDB', JSON.stringify(historyDB));
+            renderHistory();
+        }
+
+        function deleteTask(dIdx, bIdx, tIdx) { if(confirm("මෙම Task එක මකා දමන්නද?")) { historyDB[dIdx].blocks[bIdx].tasks.splice(tIdx, 1); recalcDay(dIdx); } }
+        function deleteBlock(dIdx, bIdx) { if(confirm("මෙම ප්‍රමිත කාලය මකා දමන්නද?")) { historyDB[dIdx].blocks.splice(bIdx, 1); recalcDay(dIdx); } }
+        function deleteDay(dIdx) { if(confirm("මෙම දිනයේ සම්පූර්ණ දත්ත මකා දමන්නද?")) { historyDB.splice(dIdx, 1); localStorage.setItem('alWorksheetDB', JSON.stringify(historyDB)); renderHistory(); } }
+
+        let calcStr = "";
+        function cp(val) {
+            let screen = document.getElementById('calcScreen');
+            if(val === 'AC') { calcStr = ""; } 
+            else if(val === 'DEL') { calcStr = calcStr.slice(0, -1); } 
+            else if(val === '=') {
+                try {
+                    let str = calcStr.replace(/\s+/g, ''); 
+                    let parts = str.split(/([+-])/);
+                    let totalMins = 0; let op = '+';
+                    for(let p of parts) {
+                        if(p === '+' || p === '-') { op = p; } 
+                        else if(p) {
+                            let hMatch = p.match(/(\d+)h/); let mMatch = p.match(/(\d+)m/);
+                            let h = hMatch ? parseInt(hMatch[1]) : 0; let m = mMatch ? parseInt(mMatch[1]) : 0;
+                            let mins = (h * 60) + m;
+                            if(!hMatch && !mMatch) mins = parseInt(p) || 0; 
+                            if(op === '+') totalMins += mins; else totalMins -= mins;
+                        }
+                    }
+                    calcStr = fmt(totalMins);
+                } catch(e) { calcStr = "Error"; }
+            } else {
+                if(calcStr === "Error") calcStr = "";
+                calcStr += val;
+            }
+            screen.innerText = calcStr.replace(/\+/g, ' + ').replace(/\-/g, ' - ') || "0h 0m";
+        }
+
+        function calculateDecimal() {
+            let valStr = document.getElementById('decInput').value.toString().trim();
+            let h = 0, m = 0;
+            if(valStr.includes('.')) {
+                let parts = valStr.split('.');
+                h = parseInt(parts[0]) || 0;
+                m = parseInt(parts[1]) || 0;
+            } else { h = parseInt(valStr) || 0; }
+            let totalMins = (h * 60) + m;
+            document.getElementById('decResult').innerText = `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
+        }
+
+        // --- BALANCED IN-PLACE PRINTING LOGIC ---
+        function generateAndPrint(mode) {
+            let dataToPrint = historyDB.slice().reverse(); // Oldest first
+
+            if(mode === 'range') {
+                let sD = new Date(document.getElementById('pdfStart').value);
+                let eD = new Date(document.getElementById('pdfEnd').value);
+                dataToPrint = dataToPrint.filter(r => { let d = new Date(r.date); return d >= sD && d <= eD; });
+            }
+            
+            if(dataToPrint.length === 0) return alert("මෙම කාලය සඳහා දත්ත නොමැත!");
+
+            let html = `<h2>A/L Worksheet Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>දිනය<br>Date</th>
+                        <th>ප්‍රමිත කාලය<br>Standard Time</th>
+                        <th>ඉටු කළ කාර්යයන්<br>Task Finished</th>
+                        <th>ගත වූ කාලය<br>Elapsed Time</th>
+                        <th>SUB 01<br><b style="color:#000;">Acc</b></th>
+                        <th>SUB 02<br><b style="color:#000;">BS</b></th>
+                        <th>SUB 03<br><b style="color:#000;">IT/Econ</b></th>
+                        <th>සත්‍ය කාලය<br>Actual Time</th>
+                        <th>අක්‍රිය කාලය<br>Idle Time</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            let weekStd = 0, weekAct = 0, weekAcc = 0, weekBs = 0, weekIct = 0;
+            let dayCount = 0;
+
+            dataToPrint.forEach((day, index) => {
+                let dayAcc = 0, dayBs = 0, dayIct = 0;
+
+                day.blocks.forEach((b, bIdx) => {
+                    if(b.tasks.length === 0) {
+                        html += `<tr>
+                            <td>${bIdx===0 ? day.date : ""}</td>
+                            <td>${fmt(b.totalMins)}</td>
+                            <td class="task-name">No Tasks</td>
+                            <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                        </tr>`;
+                    } else {
+                        b.tasks.forEach((t, tIdx) => {
+                            if(t.sub === "Accounting") dayAcc += t.mins;
+                            if(t.sub === "Business Studies") dayBs += t.mins;
+                            if(t.sub === "ICT/Econ") dayIct += t.mins;
+                            
+                            html += `<tr>
+                                <td>${tIdx===0 && bIdx===0 ? day.date : ""}</td>
+                                <td>${tIdx===0 ? fmt(b.totalMins) : ""}</td>
+                                <td class="task-name">${t.name}</td>
+                                <td>${t.start} - ${t.end}</td>
+                                <td>${t.sub==="Accounting" ? fmt(t.mins) : "-"}</td>
+                                <td>${t.sub==="Business Studies" ? fmt(t.mins) : "-"}</td>
+                                <td>${t.sub==="ICT/Econ" ? fmt(t.mins) : "-"}</td>
+                                <td></td><td></td>
+                            </tr>`;
+                        });
+                    }
+                });
+
+                // Day Total Row
+                html += `<tr class="day-total">
+                    <td>DAY TOTAL</td>
+                    <td>${fmt(day.totStd)}</td>
+                    <td></td><td></td>
+                    <td>${fmt(dayAcc)}</td>
+                    <td>${fmt(dayBs)}</td>
+                    <td>${fmt(dayIct)}</td>
+                    <td>${fmt(day.totAct)}</td>
+                    <td>${fmt(day.totStd - day.totAct)}</td>
+                </tr>`;
+
+                // Weekly Accumulation
+                weekStd += day.totStd; weekAct += day.totAct; weekAcc += dayAcc; weekBs += dayBs; weekIct += dayIct; dayCount++;
+
+                // Weekly Total Row
+                if(dayCount === 7 || index === dataToPrint.length - 1) {
+                    html += `<tr class="week-total">
+                        <td>WEEK TOTAL</td>
+                        <td>${fmt(weekStd)}</td>
+                        <td></td><td></td>
+                        <td>${fmt(weekAcc)}</td>
+                        <td>${fmt(weekBs)}</td>
+                        <td>${fmt(weekIct)}</td>
+                        <td>${fmt(weekAct)}</td>
+                        <td>${fmt(weekStd - weekAct)}</td>
+                    </tr>
+                    <tr class="spacer-row"><td colspan="9"></td></tr>`;
+                    
+                    weekStd = 0; weekAct = 0; weekAcc = 0; weekBs = 0; weekIct = 0; dayCount = 0;
+                }
+            });
+
+            html += `</tbody></table>`;
+
+            document.getElementById('printArea').innerHTML = html;
+
+            // Give the browser a tiny moment to render the HTML before calling print
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
     </script>
 </body>
 </html>
