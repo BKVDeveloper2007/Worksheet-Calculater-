@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="si" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,31 +9,33 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
+        /* Dark Mode (දැන් Premium Blue පාටින් වැඩ කරයි) */
         :root {
             --bg: #000;
             --card: #111;
-            --yellow: #ffcc00;
+            --yellow: #0056b3; /* Premium Blue */
             --text: #fff;
             --gray: #888;
             --border: #222;
             --input-bg: #1a1a1a;
             --input-border: #333;
             --bar-bg: #222;
-            --btn-text: #000;
+            --btn-text: #ffffff; /* නිල් පසුබිමට සුදු අකුරු */
             --danger: #ff4d4d;
         }
 
+        /* Light Mode (Premium Blue) */
         [data-theme="light"] {
             --bg: #ffffff;
-            --card: #f5f5f7;
-            --yellow: #ffcc00;
+            --card: #f8f9fa;
+            --yellow: #0056b3; /* Premium Blue */
             --text: #000;
-            --gray: #666;
-            --border: #ddd;
-            --input-bg: #fff;
-            --input-border: #ccc;
-            --bar-bg: #e0e0e0;
-            --btn-text: #000;
+            --gray: #555;
+            --border: #dee2e6;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --bar-bg: #e9ecef;
+            --btn-text: #ffffff; /* නිල් පසුබිමට සුදු අකුරු */
         }
 
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 30px; transition: 0.3s ease; }
@@ -44,8 +46,9 @@
         .bulb-btn:active { transform: scale(0.9); }
 
         header { padding: 0 20px 20px 20px; text-align: center; }
-        .title { font-size: 2.5rem; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin: 0; text-transform: uppercase; }
-        .yellow-text { color: var(--yellow); display: block; }
+        .title { font-size: 3.5rem; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin: 0; text-transform: uppercase; color: var(--text); }
+        .subtitle { display: block; font-size: 2.5rem; }
+        .yellow-text { color: var(--yellow); display: inline; }
 
         .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; padding: 0 15px; flex-wrap: wrap; }
         .tab-btn { background: var(--card); color: var(--gray); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
@@ -93,7 +96,7 @@
         .h-block { margin-top: 10px; padding: 10px; background: var(--bar-bg); border-radius: 8px; }
         .h-block-title { font-size: 0.85rem; color: var(--text); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between;}
         
-        /* Fixed Calculator App UI Styles */
+        /* Calculator App UI Styles */
         .calc-screen { 
             background: var(--input-bg); 
             border: 1px solid var(--input-border); 
@@ -108,14 +111,13 @@
             width: 100%; 
             max-width: 100%; 
             box-sizing: border-box; 
-            overflow-x: auto; /* Forces horizontal scroll if content is too long */
+            overflow-x: auto; 
             overflow-y: hidden; 
-            white-space: nowrap; /* Keeps everything on one line */
+            white-space: nowrap; 
             letter-spacing: 2px; 
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); 
         }
         
-        /* Scrollbar for calculator screen */
         .calc-screen::-webkit-scrollbar { height: 6px; }
         .calc-screen::-webkit-scrollbar-track { background: transparent; }
         .calc-screen::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -125,27 +127,20 @@
         .calc-btn:hover { background: var(--input-bg); }
         .calc-btn:active { transform: scale(0.95); }
         .btn-op { color: var(--yellow); border-color: var(--border); font-size: 1.6rem; }
-        .btn-eq { background: var(--yellow); color: #000; grid-column: span 4; font-size: 1.5rem; }
+        .btn-eq { background: var(--yellow); color: var(--btn-text); grid-column: span 4; font-size: 1.5rem; }
         .calc-result { background: var(--bg); border: 1px dashed var(--yellow); color: var(--yellow); padding: 15px; text-align: center; font-size: 1.5rem; font-weight: 900; border-radius: 12px; margin-top: 15px; }
 
-        /* =========================================
-           PRINT SPECIFIC STYLES (Balanced Layout)
-           ========================================= */
+        /* PRINT SPECIFIC STYLES */
         #printArea { display: none; }
 
         @media print {
             @page { size: landscape; margin: 12mm; }
-
             .mode-toggle, header, .tabs, .tab-content { display: none !important; }
             body { background: #fff !important; margin: 0; padding: 0; }
-            
             #printArea { display: block !important; width: 100%; color: #000; background: #fff; }
-            
             #printArea h2 { text-align: center; text-transform: uppercase; margin-bottom: 15px; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            
             #printArea table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; color: #000; table-layout: fixed; }
             #printArea th, #printArea td { border: 1px solid #000; padding: 8px 4px; word-wrap: break-word; vertical-align: middle; }
-            
             #printArea th:nth-child(1) { width: 10%; } 
             #printArea th:nth-child(2) { width: 12%; } 
             #printArea th:nth-child(3) { width: 26%; } 
@@ -155,11 +150,9 @@
             #printArea th:nth-child(7) { width: 8%; }  
             #printArea th:nth-child(8) { width: 8%; }  
             #printArea th:nth-child(9) { width: 8%; }  
-
             #printArea th { background-color: #d9d9d9 !important; color: #000 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #printArea .day-total td { background-color: #111 !important; color: #fff !important; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #printArea .week-total td { background-color: #d9d9d9 !important; color: #000 !important; font-weight: bold; font-size: 12px; border-top: 2px solid #000; border-bottom: 2px solid #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            
             #printArea .task-name { text-align: left; padding-left: 8px; }
             #printArea .spacer-row td { border: none !important; height: 15px; }
         }
@@ -172,13 +165,18 @@
     </div>
 
     <header>
-        <div class="title">WORKSHEET <span class="yellow-text">PRO</span></div>
+        <div class="title">
+            WORKSHEET
+            <span class="subtitle">
+                <span class="yellow-text">HELPER PRO</span>
+            </span>
+        </div>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Home</button>
-        <button class="tab-btn" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
-        <button class="tab-btn" onclick="switchTab('calculator')"><i class="fa-solid fa-calculator"></i> Calculator</button>
+        <button class="tab-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="tab-btn" onclick="switchTab('history', this)"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+        <button class="tab-btn" onclick="switchTab('calculator', this)"><i class="fa-solid fa-calculator"></i> Calculator</button>
     </div>
 
     <div id="tab-home" class="tab-content active">
@@ -207,7 +205,7 @@
                     <option value="Business Studies">Business Studies (SUB 02)</option>
                     <option value="ICT/Econ">ICT/Econ (SUB 03)</option>
                 </select>
-                <button class="btn-main" style="background: #fff; color: #000;" onclick="addTask()"><i class="fa-solid fa-plus"></i> Task එකතු කරන්න</button>
+                <button class="btn-main" onclick="addTask()"><i class="fa-solid fa-plus"></i> Task එකතු කරන්න</button>
                 <div id="taskList" class="task-list">අතරමැද කාර්යයන් මෙහි පෙන්වයි...</div>
                 <button class="btn-secondary" onclick="finishStandardBlock()"><i class="fa-solid fa-check-double"></i> ප්‍රමිත කාලය අවසන් කරන්න</button>
             </div>
@@ -287,17 +285,23 @@
     <div id="printArea"></div>
 
     <script>
+        // Light & Dark Mode Toggle
         function toggleMode() {
             const root = document.documentElement;
-            root.setAttribute('data-theme', root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            if (root.getAttribute('data-theme') === 'light') {
+                root.setAttribute('data-theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+            }
         }
 
-        function switchTab(tabId) {
+        // Switch Tabs
+        function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(tabId === 'history') renderHistory();
+            if (btn) btn.classList.add('active');
+            if (tabId === 'history') renderHistory();
         }
 
         let currentBlock = null; 
@@ -470,7 +474,7 @@
                 calcStr += val;
             }
             screen.innerText = calcStr.replace(/\+/g, ' + ').replace(/\-/g, ' - ') || "0h 0m";
-            screen.scrollLeft = screen.scrollWidth; // Auto scroll horizontally to show latest input
+            screen.scrollLeft = screen.scrollWidth; 
         }
 
         function calculateDecimal() {
@@ -485,6 +489,7 @@
             document.getElementById('decResult').innerText = `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
         }
 
+        // Generate and Print Reports
         function generateAndPrint(mode) {
             let dataToPrint = historyDB.slice().reverse(); 
 
@@ -523,7 +528,7 @@
                     if(b.tasks.length === 0) {
                         html += `<tr>
                             <td>${bIdx===0 ? day.date : ""}</td>
-                            <td>${fmt(b.totalMins)}</td>
+                            <td>${b.start} - ${b.end}</td> 
                             <td class="task-name">No Tasks</td>
                             <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
                         </tr>`;
@@ -535,7 +540,7 @@
                             
                             html += `<tr>
                                 <td>${tIdx===0 && bIdx===0 ? day.date : ""}</td>
-                                <td>${tIdx===0 ? fmt(b.totalMins) : ""}</td>
+                                <td>${tIdx===0 ? `${b.start} - ${b.end}` : ""}</td>
                                 <td class="task-name">${t.name}</td>
                                 <td>${t.start} - ${t.end}</td>
                                 <td>${t.sub==="Accounting" ? fmt(t.mins) : "-"}</td>
